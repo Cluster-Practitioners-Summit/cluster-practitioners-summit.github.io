@@ -329,14 +329,21 @@ p {
 
 .details-ctas {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
   margin-top: 2rem;
 }
 
 .details-ctas .register {
   margin-top: 0;
+}
+
+.details-ctas-small {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  max-width: 100%;
 }
 
 .register {
@@ -360,6 +367,12 @@ p {
 .register:focus-visible {
   background: #111;
   color: #fff;
+}
+
+.register-small {
+  padding: 0.5em 1.1em;
+  font-size: clamp(0.7rem, 0.85vw, 0.8rem);
+  white-space: nowrap;
 }
 
 /* credit line pinned to the bottom of the last panel (a separate footer
