@@ -249,7 +249,14 @@ p {
 /* hero lede: bold lockup line, JS-fitted to the h1's width (see main.js);
    inline-block so its measured width is the text, not the container */
 .hero .lede {
-  display: inline-block;
+  /* block (not inline-block) so it always breaks onto its own line under the
+     h1, even when docked: position:fixed frees .lockup from .hero .copy's
+     max-width, and at wide viewports the two lines fit side by side otherwise.
+     width stays content-sized (not full container) to keep JS's width-based
+     font scaling in fitLede() accurate. */
+  display: block;
+  width: max-content;
+  margin-inline: auto;
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.15;
