@@ -314,7 +314,7 @@ p {
   transform: translateY(20px);
 }
 
-.side-cta {
+.side-cta-wrap {
   position: absolute;
   /* midpoint between the copy column's right edge and the viewport edge —
      same gap-center math cloud.js uses to place the shape itself */
@@ -326,12 +326,21 @@ p {
      off-screen. --expect-shape-bottom is the chevrons.png shape's rendered
      bottom edge in viewport px, kept live by cloud.js/main.js. */
   top: calc(var(--expect-shape-bottom, 62vh) + 30px);
+  text-align: center;
 }
 
 /* .register's margin-top:2rem would otherwise win the cascade (equal
    specificity, declared later) and throw off the offset above */
 .register.side-cta {
   margin-top: 0;
+}
+
+.side-cta-note,
+.cta-note {
+  margin-top: 0.75rem;
+  font-size: 0.9375rem;
+  color: #666;
+  text-align: center;
 }
 
 .details-ctas {
@@ -429,9 +438,10 @@ p {
   /* two-column layout collapses on mobile; keep the CTA absolute (its
      sibling .copy is still a lone flex child here) but re-anchor it
      bottom-center instead of into a "side" that no longer exists */
-  .side-cta {
+  .side-cta-wrap {
     right: auto;
     left: 50%;
+    top: auto;
     bottom: 4svh;
     transform: translateX(-50%);
   }
@@ -455,12 +465,13 @@ p {
 
   /* content-driven height means an absolute bottom-% anchor can't reliably
      clear the text anymore — flow it in normally, right after the copy */
-  .panel:not(.hero):not([data-shape-mobile-top]) .side-cta {
+  .panel:not(.hero):not([data-shape-mobile-top]) .side-cta-wrap {
     position: static;
     left: auto;
     bottom: auto;
     transform: none;
     margin-top: 1.5rem;
+    text-align: left;
   }
 }
 
