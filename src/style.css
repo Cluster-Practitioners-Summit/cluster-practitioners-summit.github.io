@@ -306,11 +306,11 @@ p {
 
 /* pins a CTA into the empty half of a panel (opposite the copy column),
    where that section's point-cloud shape renders — see cloud.js */
-#expect {
+#lightningtalks {
   position: relative;
 }
 
-#expect .copy {
+#lightningtalks .copy {
   transform: translateY(20px);
 }
 
@@ -321,7 +321,7 @@ p {
   left: calc((clamp(1.5rem, 5vw, 5rem) + 32rem + 100%) / 2);
   transform: translateX(-50%);
   /* anchored from the panel's TOP (which aligns with the viewport top once
-     scroll-snapped), not its bottom — #expect's copy is taller than 100svh,
+     scroll-snapped), not its bottom — #lightningtalks's copy is taller than 100svh,
      so a bottom-% anchor scales with that overflow and can push the button
      off-screen. --expect-shape-bottom is the chevrons.png shape's rendered
      bottom edge in viewport px, kept live by cloud.js/main.js. */

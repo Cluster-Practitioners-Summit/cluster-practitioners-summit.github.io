@@ -303,7 +303,7 @@ export function startCloud(canvas, sectionEls, N, initial, markPts) {
   }
 
   // viewport px (from the top) of a section's resting shape's lowest point —
-  // lets CSS pin UI (e.g. the #expect CTA) just below it, see style.css
+  // lets CSS pin UI (e.g. the #lightningtalks CTA) just below it, see style.css
   function shapeBottomPx(k) {
     const pts = targets[k];
     const [, oy, , sy, , oz] = transform(k);

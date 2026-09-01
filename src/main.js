@@ -8,6 +8,19 @@ const N = coarse ? 6000 : 14000;
 
 const sections = [...document.querySelectorAll(".panel[data-shape]")];
 
+// keep the URL hash in sync with whichever section is on screen, so a
+// copied URL (or the anchor tag alone) lands back on that section
+const hashObserver = new IntersectionObserver(
+  (entries) => {
+    const visible = entries.find((e) => e.isIntersecting);
+    if (!visible) return;
+    const hash = visible.target.id === "hero" ? "" : `#${visible.target.id}`;
+    history.replaceState(null, "", location.pathname + hash);
+  },
+  { threshold: 0.6 },
+);
+sections.forEach((el) => hashObserver.observe(el));
+
 // Render immediately with the hero's procedural shape; swap in each
 // section's real shape (image-sampled or procedural) as it resolves.
 // The logo mark blob is sampled from its own image (scatter as fallback).
@@ -17,7 +30,7 @@ const [initial, markPts] = await Promise.all([
 ]);
 const cloud = startCloud(document.querySelector("#cloud"), sections, N, initial, markPts);
 
-const expectIndex = sections.findIndex((el) => el.id === "expect");
+const expectIndex = sections.findIndex((el) => el.id === "lightningtalks");
 // keeps --expect-shape-bottom (the chevrons.png shape's rendered bottom edge)
 // live for the "Submit a Lightning Talk" button, see .side-cta in style.css
 function updateCtaOffset() {
