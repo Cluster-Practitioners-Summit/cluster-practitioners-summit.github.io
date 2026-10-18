@@ -229,6 +229,8 @@ export function startCloud(canvas, sectionEls, N, initial, markPts) {
   // (toward the copy) — the offset shifts down by the added height so the
   // shape's top edge stays put instead of growing upward too
   const mobileStretchY = sectionEls.map((el) => parseFloat(el.dataset.mobileStretchY) || 1);
+  // desktop-only vertical stretch via data-stretch-y, about the shape's center
+  const deskStretchY = sectionEls.map((el) => parseFloat(el.dataset.stretchY) || 1);
   const SHAPE_HALF_HEIGHT = 0.3; // approx local half-height shared by the procedural shapes
   // extra per-section nudges: shift up by N px (data-shape-offset-y) and
   // push back from the camera by N world units (data-shape-depth) — resize()
@@ -256,7 +258,30 @@ export function startCloud(canvas, sectionEls, N, initial, markPts) {
     return pts;
   }
 
+  // data-align-top: px to push a desktop shape down so its top edge meets the
+  // top of the section's first paragraph; cached, cleared on resize / new targets
+  const alignTop = sectionEls.map((el) => "alignTop" in el.dataset);
+  // data-dots-down: px to nudge only the dots down, leaving the glow in place
+  const dotsDown = sectionEls.map((el) => parseFloat(el.dataset.dotsDown) || 0);
+  const alignDy = [];
+  function alignTopDy(k) {
+    if (alignDy[k] === undefined) {
+      const pts = targets[k];
+      if (!pts) return 0; // image not sampled yet; don't cache
+      const [, oy, , sy, , oz] = transform(k, false);
+      const visHAtZ = visH * ((CAM_DIST - oz) / CAM_DIST);
+      let maxY = -Infinity;
+      for (let p = 1; p < pts.length; p += 3) maxY = Math.max(maxY, pts[p] * sy + oy);
+      const shapeTop = innerHeight * (0.5 - maxY / visHAtZ);
+      const copyTop = sectionEls[k].querySelector(".copy > p").getBoundingClientRect().top -
+        sectionEls[k].getBoundingClientRect().top;
+      alignDy[k] = copyTop - shapeTop;
+    }
+    return alignDy[k];
+  }
+
   function resize() {
+    alignDy.length = 0;
     const w = innerWidth;
     const h = innerHeight;
     renderer.setSize(w, h);
@@ -289,8 +314,9 @@ export function startCloud(canvas, sectionEls, N, initial, markPts) {
   document.fonts.ready.then(resize); // section offsets shift when ZT Nature loads
 
   // world-space [x, y, xScale, yScale, dotSize, z] of the morph cloud for section k
-  function transform(k) {
-    const upOffset = (shapeOffsetYPx[k] / innerHeight) * visH;
+  function transform(k, align = true) {
+    const dy = align && wide && alignTop[k] ? alignTopDy(k) : 0;
+    const upOffset = ((shapeOffsetYPx[k] - dy) / innerHeight) * visH;
     if (!wide && mobileTop[k]) {
       const s = Math.min(visW * 0.9, visH * 0.3) * shapeScale[k];
       const stretchY = mobileStretchY[k];
@@ -299,7 +325,7 @@ export function startCloud(canvas, sectionEls, N, initial, markPts) {
       return [0, oy, s, sy, s * (coarse ? 0.016 : 0.011) * dotScale[k], shapeDepth[k]];
     }
     const s = scale * shapeScale[k];
-    return [sideX[k], upOffset, s, s, s * (coarse ? 0.016 : 0.011) * dotScale[k], shapeDepth[k]];
+    return [sideX[k], upOffset, s, s * deskStretchY[k], s * (coarse ? 0.016 : 0.011) * dotScale[k], shapeDepth[k]];
   }
 
   // viewport px (from the top) of a section's resting shape's lowest point —
@@ -358,7 +384,7 @@ export function startCloud(canvas, sectionEls, N, initial, markPts) {
     const [xA, yA, sxA, syA, dA, zA] = transform(i);
     const [xB, yB, sxB, syB, dB, zB] = transform(j);
     const ox = xA * u + xB * t;
-    const oy = yA * u + yB * t;
+    const oy = (yA - (dotsDown[i] / innerHeight) * visH) * u + (yB - (dotsDown[j] / innerHeight) * visH) * t;
     const oz = zA * u + zB * t;
     const sxNow = sxA * u + sxB * t;
     const syNow = syA * u + syB * t;
@@ -565,6 +591,7 @@ export function startCloud(canvas, sectionEls, N, initial, markPts) {
   return {
     setTarget(index, pts) {
       targets[index] = pts;
+      alignDy.length = 0;
       hulls[index] = polarHull(pts, HULL_ANGLES);
     },
     // registers a section's real shape image/svg as its glow layer (drawn
