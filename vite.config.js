@@ -42,6 +42,13 @@ function inlineEverything() {
       const faviconUri = await dataUri(resolve("public/favicon.png"));
       html = html.replace('href="./favicon.png"', `href="${faviconUri}"`);
 
+      // Same for the speaker headshots referenced by <img src> in the page.
+      const headshotsDir = resolve("public/headshots");
+      for (const file of await readdir(headshotsDir)) {
+        const uri = await dataUri(join(headshotsDir, file));
+        html = html.replaceAll(`src="headshots/${file}"`, () => `src="${uri}"`);
+      }
+
       // Inline the CSS chunk, with its @font-face url()s swapped for data URIs.
       const files = await readdir(dir);
       const cssFile = files.find((f) => f.endsWith(".css"));
@@ -89,6 +96,7 @@ function inlineEverything() {
       await rm(join(dir, "fonts"), { recursive: true, force: true });
       await rm(join(dir, "shapes"), { recursive: true, force: true });
       await rm(join(dir, "assets"), { recursive: true, force: true });
+      await rm(join(dir, "headshots"), { recursive: true, force: true });
     },
   };
 }
