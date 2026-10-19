@@ -500,3 +500,8 @@ p {
   display: block;
   margin-top: 0.25rem;
 }
+
+/* joint photo of two speakers: show it uncropped instead of square */
+.guests img.wide {
+  aspect-ratio: auto;
+}
