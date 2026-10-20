@@ -505,3 +505,10 @@ p {
 .guests img.wide {
   aspect-ratio: auto;
 }
+
+/* chairs' headshots in Details: same treatment, smaller row */
+.guests.chairs {
+  max-width: 15rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
